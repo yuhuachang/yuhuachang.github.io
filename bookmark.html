@@ -1,0 +1,370 @@
+<pre>
+
+====================================================================================================================================
+oAuth2 on Spring Security and JavaScript
+
+https://www.toptal.com/java/rest-security-with-jwt-spring-security-and-java
+https://github.com/DylanMeeus/springboot_jwt_blog/tree/master/src/main/java/demo/security/jwt
+https://auth0.com/blog/securing-spring-boot-with-jwts/
+http://www.svlada.com/jwt-token-authentication-with-spring-boot/
+https://github.com/Azure-Samples/active-directory-javascript-singlepageapp-dotnet-webapi/blob/master/TodoSPA/App/Scripts/Ctrls/todoListCtrl.js
+https://github.com/AzureAD/azure-activedirectory-library-for-js
+http://paulryan.com.au/2015/unified-api-adal/
+http://nickvandenheuvel.eu/2016/01/06/authenticate-an-office-365-user-with-adal-js/
+https://github.com/lynndylanhurley/redux-auth
+http://stackoverflow.com/questions/32236568/how-to-set-up-an-oauth2-authentication-provider-with-aws-api-gateway
+https://github.com/auth0-blog/redux-auth/blob/master/index.js
+https://auth0.com/blog/secure-your-react-and-redux-app-with-jwt-authentication/
+https://github.com/mzabriskie/axios
+https://github.com/reddit/reddit/wiki/OAuth2-Quick-Start-Example
+https://www.reddit.com/r/redditdev/comments/2owrnn/oauth2_implicit_grants_cors_apponly_oauth2/
+
+
+====================================================================================================================================
+What is Fetch api and how do I set header to it?
+https://www.jonathanfielding.com/fetch-api-in-the-browser-it-has-happened/
+http://stackoverflow.com/questions/34772753/how-to-parse-json-after-exception-handling-promise-with-isomorphic-fetch
+https://developer.mozilla.org/en-US/docs/Web/API/Headers#Examples
+https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch
+
+Another one --> axios
+https://github.com/mzabriskie/axios
+
+The old one --> jQuery
+http://api.jquery.com/jquery.ajax/
+
+====================================================================================================================================
+JWT (Json Web Token)
+https://github.com/szerhusenBC/jwt-spring-security-demo/blob/master/src/main/java/org/zerhusen/security/JwtTokenUtil.java
+https://github.com/Azure-Samples/active-directory-java-native-headless/blob/master/src/main/java/PublicClient.java
+https://github.com/jwtk/jjwt
+https://www.toptal.com/java/rest-security-with-jwt-spring-security-and-java
+https://github.com/spring-projects/spring-security-oauth/blob/master/spring-security-jwt/src/main/java/org/springframework/security/jwt/codec/Base64Codec.java
+http://stackoverflow.com/questions/469695/decode-base64-data-in-java
+https://www.mkyong.com/java/how-do-convert-byte-array-to-string-in-java/
+http://stackoverflow.com/questions/5245840/how-to-convert-string-to-jsonobject-in-java
+http://farenda.com/java/java-base64-url/
+https://javadigest.wordpress.com/2012/08/26/rsa-encryption-example/
+
+====================================================================================================================================
+Same Origin Policy:
+https://www.html5rocks.com/en/tutorials/cors/
+https://en.wikipedia.org/wiki/Same-origin_policy
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Access_control_CORS
+https://spring.io/blog/2015/06/08/cors-support-in-spring-framework
+https://www.html5rocks.com/en/tutorials/cors/
+http://stackoverflow.com/questions/12111936/angularjs-performs-an-options-http-request-for-a-cross-origin-resource
+http://stackoverflow.com/questions/33645511/why-my-ajax-showing-preflight-is-invalid-redirect-error
+
+Basically, all the resource should be from the same origin or server will not allow it to be loaded.
+To allow different origin source (cross origin resource share, ie. CORS), we need to specifically allow it from the server.
+In SpringBoot, that means adding @CrossOrigin in the controller.
+
+====================================================================================================================================
+Now I have the certificate from Microsoft, how do I get the RSA public key??
+
+http://stackoverflow.com/questions/28294663/how-to-convert-from-string-to-publickey
+http://stackoverflow.com/questions/19366498/load-stored-rsa-public-private-key-from-disk
+http://nzpcmad.blogspot.tw/2016/08/oauth2-verifying-azure-ad-jwt-signature.html
+http://stackoverflow.com/questions/32143743/verifying-jwt-from-azure-active-directory
+https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-token-and-claims
+https://docs.oracle.com/javase/tutorial/networking/urls/readingURL.html
+https://docs.oracle.com/javase/8/docs/api/
+http://stackoverflow.com/questions/11410770/load-rsa-public-key-from-file
+http://stackoverflow.com/questions/11787571/how-to-read-pem-file-to-get-private-and-public-key
+http://stackoverflow.com/questions/18856431/rsa-keys-transformation-for-java-clarification-needed
+http://codeartisan.blogspot.tw/2009/05/public-key-cryptography-in-java.html
+http://stackoverflow.com/questions/24137463/how-to-load-public-certificate-from-pem-file/24139603
+http://stackoverflow.com/questions/782178/how-do-i-convert-a-string-to-an-inputstream-in-java
+http://stackoverflow.com/questions/10332022/rsa-decryption-with-a-public-key
+http://stackoverflow.com/questions/31915617/how-to-encrypt-string-with-public-key-and-decrypt-with-private-key
+https://jwt.io/
+
+    
+    /**
+     *     1. go to here: https://login.microsoftonline.com/common/.well-known/openid-configuration
+     *     2. check the value of "jwks_uri", which is "https://login.microsoftonline.com/common/discovery/keys"
+     *     3. go to https://login.microsoftonline.com/common/discovery/keys
+     *     4. get "kid" value from header, which is "Y4ueK2oaINQiQb5YEBSYVyDcpAU"
+     *     5. search Y4ueK2oaINQiQb5YEBSYVyDcpAU in key file to get the key.
+     *     
+     *     (We can manually decode JWT token at https://jwt.io/ by copy'n'paste)
+     *     to select the public key used to sign this token.
+     *     (There are about three keys which are rotated about everyday.)
+     *     
+     * @throws IOException
+     * @throws CertificateException 
+     */
+    protected PublicKey loadPublicKey() throws IOException, CertificateException {
+
+        // Key Info (RSA PublicKey)
+        String openidConfigStr = readUrl("https://login.microsoftonline.com/common/.well-known/openid-configuration");
+//        System.out.println(openidConfigStr);
+        JSONObject openidConfig = new JSONObject(openidConfigStr);
+//        System.out.println("---------------------------------");
+
+        String jwksUri = openidConfig.getString("jwks_uri");
+//        System.out.println(jwksUri);
+//        System.out.println("---------------------------------");
+        
+        String jwkConfigStr = readUrl(jwksUri);
+//        System.out.println(jwkConfigStr);
+        JSONObject jwkConfig = new JSONObject(jwkConfigStr);
+//        System.out.println("---------------------------------");
+        
+        JSONArray keys = jwkConfig.getJSONArray("keys");
+        for (int i = 0; i < keys.length(); i++) {
+            JSONObject key = keys.getJSONObject(i);
+
+            String kid = key.getString("kid");
+            String x5t = key.getString("x5t");
+            String n = key.getString("n");
+            String e = key.getString("e");
+            String x5c = key.getJSONArray("x5c").getString(0);
+
+//            System.out.println("kid: " + kid);
+//            System.out.println("x5t: " + x5t);
+//            System.out.println("n: " + n);
+//            System.out.println("e: " + e);
+//            System.out.println("x5c: " + x5c);
+
+            String keyStr = "-----BEGIN CERTIFICATE-----\r\n";
+            String tmp = x5c;
+            while (tmp.length() > 0) {
+                if (tmp.length() > 64) {
+                    String x = tmp.substring(0, 64);
+                    keyStr += x + "\r\n";
+                    tmp = tmp.substring(64);
+                } else {
+                    keyStr += tmp + "\r\n";
+                    tmp = "";
+                }
+            }
+            keyStr += "-----END CERTIFICATE-----\r\n";
+//            System.out.println(keyStr);
+            /*
+             * go to https://jwt.io/ and copy'n'paste the thow jwt token to the left side, it will be decoded on the right side,
+             * copy'n'past the public key (from ----BEGIN... to END CERT...) to the verify signature part, it will show signature verified.
+             */
+            
+            //byte[] keyBytes = keyStr.getBytes();
+            //byte[] keyBytes = x5c.getBytes();
+            //byte[] keyBytes = Base64.getDecoder().decode(x5c);
+            
+//            X509EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
+//            KeyFactory kf = KeyFactory.getInstance("RSA");
+//            PublicKey publicKey = kf.generatePublic(spec);
+//            System.out.println(publicKey);
+            
+            // read certification
+            CertificateFactory fact = CertificateFactory.getInstance("X.509");
+            InputStream stream = new ByteArrayInputStream(keyStr.getBytes(StandardCharsets.US_ASCII));
+            X509Certificate cer = (X509Certificate) fact.generateCertificate(stream);
+//            System.out.println(cer);
+            
+            // get public key from certification
+            PublicKey publicKey = cer.getPublicKey();
+//            System.out.println(publicKey);
+            
+            if (this.kid.equals(kid)) {
+                return publicKey;
+            }
+        }
+        return null;
+    }
+
+====================================================================================================================================
+How do I validate JWT?
+
+https://github.com/Azure-Samples/active-directory-dotnet-webapi-manual-jwt-validation
+https://azure.microsoft.com/en-us/resources/samples/active-directory-dotnet-webapi-manual-jwt-validation/
+https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-authentication-libraries
+https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-token-and-claims
+http://stackoverflow.com/questions/35739932/how-do-i-decode-a-jwt-token-using-an-rsa-public-key-in-pem-format
+http://codingstill.com/2016/01/verify-jwt-token-signed-with-rs256-using-the-public-key/
+https://stormpath.com/blog/jwt-java-create-verify
+http://connect2id.com/products/nimbus-jose-jwt/examples/jwt-with-rsa-signature
+http://stackoverflow.com/questions/11621414/reading-an-x-509-certificate-with-java
+http://stackoverflow.com/questions/32185238/how-do-i-verify-a-json-web-token-using-a-public-rsa-key
+https://login.windows.net/common/discovery/keys
+http://stackoverflow.com/questions/32143743/verifying-jwt-from-azure-active-directory
+https://github.com/jwtk/jjwt
+https://stormpath.com/blog/beginners-guide-jwts-in-java
+
+
+    public AzureAdJwtToken(String token) {
+        this.token = token;
+
+        String[] parts = token.split("\\.");
+        
+        // Header
+        String headerStr = new String(Base64.getUrlDecoder().decode((parts[0])));
+//        System.out.println(headerStr);
+        JSONObject header = new JSONObject(headerStr);
+//        System.out.println("typ = " + header.getString("typ"));
+//        System.out.println("alg = " + header.getString("alg"));
+//        System.out.println("x5t = " + header.getString("x5t"));
+//        System.out.println("kid = " + header.getString("kid"));
+//        System.out.println("---------------------------------");
+        
+        x5t = header.getString("x5t");
+        kid = header.getString("kid");
+
+        // Payload
+        // reserved, public, and private claims.
+        String payloadStr = new String(Base64.getUrlDecoder().decode((parts[1])));
+//        System.out.println(payloadStr);
+        JSONObject payload = new JSONObject(payloadStr);
+//        System.out.println("aud = " + payload.getString("aud"));
+//        System.out.println("iss = " + payload.getString("iss"));
+//        System.out.println("ipaddr = " + payload.getString("ipaddr"));
+//        System.out.println("name = " + payload.getString("name"));
+//        System.out.println("unique_name = " + payload.getString("unique_name"));
+//        System.out.println("upn = " + payload.getString("upn"));
+//        System.out.println("---------------------------------");
+        
+        issuer = payload.getString("iss");
+        ipAddr = payload.getString("ipaddr");
+        name = payload.getString("name");
+        uniqueName = payload.getString("unique_name");
+    }
+
+    public void verify() throws IOException, CertificateException {
+
+        PublicKey publicKey = loadPublicKey();
+        
+//        Cipher cipher = Cipher.getInstance("RSA/ECB/NoPadding");
+//        cipher.init(Cipher.DECRYPT_MODE, publicKey);
+//        byte[] encryptedbytes = cipher.doFinal(Base64.getUrlDecoder().decode(signatureStr.getBytes()));
+//        String result = Base64.getUrlEncoder().encodeToString(encryptedbytes);
+//        System.out.println("---------------------------------");
+//        System.out.println(result);
+//        System.out.println(parts[0] + parts[1]);
+//        
+//        System.out.println("---------------------------------");
+        
+        //TODO: possible decode without 3rd party library...
+        JWTVerifier verifier = JWT.require(Algorithm.RSA256((RSAKey) publicKey)).withIssuer(issuer).build();
+        DecodedJWT jwt = verifier.verify(token);
+//        System.out.println("DecodedJWT");
+//        System.out.println(jwt);
+//        System.out.println("---------------------------------");
+    }
+====================================================================================================================================
+
+Grant Authority
+Spring tutorial (not very useful)
+https://spring.io/blog/2009/01/02/spring-security-customization-part-1-customizing-userdetails-or-extending-grantedauthority
+
+I found we need this
+http://docs.spring.io/autorepo/docs/spring-security/4.1.3.RELEASE/apidocs/org/springframework/security/core/GrantedAuthority.html
+
+This is the simpliest one to add a customized authentication manually in spring security.
+http://docs.spring.io/spring-security/site/docs/current/apidocs/org/springframework/security/web/authentication/preauth/PreAuthenticatedAuthenticationToken.html
+
+Add the authority to Spring:
+
+                // If token verification success, create Spring authentication object and grant authorities.
+                List<GrantedAuthority> authorities = new ArrayList<>();
+                
+                //TODO: get roles from db...
+                // add authorities... jwt.getUniqueName()
+                authorities.add(new SimpleGrantedAuthority("ROLE_FIREFIGHTER_USERS"));
+                authorities.add(new SimpleGrantedAuthority("ROLE_ABC"));
+                
+                Authentication authentication = new PreAuthenticatedAuthenticationToken(jwt, null, authorities);
+                authentication.setAuthenticated(true);
+                log.info("{}", authentication);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+
+====================================================================================================================================
+
+To handle preFlight message, we need CORS support in Spring.  Somehow, it doesn't work out of the box and need to add the filter manually like this:
+
+public class CorsFilter extends OncePerRequestFilter {
+
+    private static final Logger log = LoggerFactory.getLogger(CorsFilter.class);
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
+
+        // Check if this request is a valid preflight request
+        // {@see org.springframework.web.cors.CorsUtils}
+        if (HttpMethod.OPTIONS.matches(request.getMethod()) && request.getHeader(HttpHeaders.ORIGIN) != null
+                && request.getHeader(HttpHeaders.ACCESS_CONTROL_REQUEST_METHOD) != null) {
+
+            // Preflight message.  Return the client a correct response. 
+            response.setHeader("Access-Control-Allow-Origin", "*");
+            response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            response.setHeader("Access-Control-Max-Age", "3600");
+            response.setHeader("Access-Control-Allow-Headers", "authorization, content-type, xsrf-token");
+            response.addHeader("Access-Control-Expose-Headers", "xsrf-token");
+
+            response.setStatus(HttpServletResponse.SC_OK);
+        } else {
+            // Regular message
+            filterChain.doFilter(request, response);
+        }
+    }
+}
+
+and add this filter in web security config:
+
+        http.addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class);
+
+To add it in Spring way, (it seems that Spring already have it but not add automatically.) we do like this (only in security config):
+http://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/cors/CorsConfigurationSource.html
+http://docs.spring.io/spring-framework/docs/current/javadoc-api/org/springframework/web/cors/CorsConfiguration.html
+http://stackoverflow.com/questions/9559947/cross-origin-authorization-header-with-jquery-ajax
+
+        // prepare cors config
+        CorsConfiguration corsConfig = new CorsConfiguration();
+        
+        // Access-Control-Allow-Origin: *
+        corsConfig.addAllowedOrigin("*");
+        
+        // Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+        corsConfig.addAllowedMethod(HttpMethod.GET);
+        corsConfig.addAllowedMethod(HttpMethod.POST);
+        corsConfig.addAllowedMethod(HttpMethod.PUT);
+        corsConfig.addAllowedMethod(HttpMethod.DELETE);
+        corsConfig.addAllowedMethod(HttpMethod.OPTIONS);
+        
+        // Access-Control-Max-Age: 3600
+        corsConfig.setMaxAge(3600L);
+        
+        // Access-Control-Allow-Headers: authorization, content-type, xsrf-token
+        corsConfig.addAllowedHeader("authorization");
+        corsConfig.addAllowedHeader("content-type");
+        corsConfig.addAllowedHeader("xsrf-token");
+        
+        // Access-Control-Expose-Headers: xsrf-token
+        corsConfig.addExposedHeader("xsrf-token");
+        
+        // ant match any request path to apply this policy.
+        UrlBasedCorsConfigurationSource corsConfigSource = new UrlBasedCorsConfigurationSource();
+        corsConfigSource.registerCorsConfiguration("/**", corsConfig);
+
+        // this is required to handle preflight message...
+        http.addFilterBefore(new CorsFilter(corsConfigSource), ChannelProcessingFilter.class);
+
+The result is exactly the same.
+====================================================================================================================================
+
+I want to use annotation style access control on my controller, but it doesn't work. Why?
+ @PreAuthorize("hasRole('ROLE_USER')")
+  public void create(Contact contact);
+
+http://docs.spring.io/spring-security/site/docs/3.0.x/reference/el-access.html
+http://stackoverflow.com/questions/11841156/preauthorize-annotation-not-working-spring-security
+http://stackoverflow.com/questions/24865588/how-to-enable-secured-annotations-with-java-based-configuration
+
+Add another annotation to security config is the answer.
+
+@EnableGlobalMethodSecurity(securedEnabled = true, prePostEnabled = true)
+public class TkkApiApplication extends WebSecurityConfigurerAdapter {
+  ...
+
+</pre>

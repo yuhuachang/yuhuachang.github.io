@@ -1,0 +1,161 @@
+<pre>
+1.  Knowledge.
+    Traditional server authentication vs. token based authentication.
+
+    [Course] Token Based Authentication
+    https://scotch.io/tutorials/the-ins-and-outs-of-token-based-authentication
+
+    [Course] JWT
+    https://scotch.io/tutorials/the-anatomy-of-a-json-web-token
+
+2.  Hello.js
+    Hellojs is a javascript library for oAuth2 authentication.
+
+    Hello.js Tutorial
+    https://tests4geeks.com/oauth2-javascript-tutorial/
+
+    Hello.js Doc
+    https://adodson.com/hello.js/#core-methods
+
+    Azure Setting Example
+    https://github.com/MrSwitch/hello.js/issues/470
+
+    MS doc (not very useful)
+    https://azure.microsoft.com/en-us/resources/samples/active-directory-b2c-javascript-singlepageapp-dotnet-webapi/
+
+    Conclusion:
+    It seems to be very simple to use.
+    It does not work with AAD.
+
+3.  Active Directory Authentication Library (ADAL) for JavaScript
+   
+    Github
+    https://github.com/AzureAD/azure-activedirectory-library-for-js
+    https://github.com/Azure-Samples/active-directory-javascript-singlepageapp-dotnet-webapi/blob/master/TodoSPA/App/Scripts/app.js
+    https://github.com/Azure-Samples/active-directory-javascript-singlepageapp-dotnet-webapi/blob/master/TodoSPA/App/Scripts/Ctrls/todoListCtrl.js
+
+    Tutorial:
+    http://nickvandenheuvel.eu/2016/01/06/authenticate-an-office-365-user-with-adal-js/
+    http://paulryan.com.au/2015/unified-api-adal/
+
+4.  Run test server on port 80 instead of port 3000
+    [Discussion] https://github.com/facebookincubator/create-react-app/issues/1083
+
+    To use create-react-app to create a React.js application is easy.
+    After application is created, we can use "npm start" to start a webpack-dev-server on port 3000.
+    If we want to change it to a different port, we need to modify package.json:
+      "scripts": {
+        "start": "cross-env PORT=80 react-scripts start",
+        ...
+    And to have it works, we need to "npm install cross-env --save" first.
+    To sum up, we set the environment variable (unix style) PORT to tell dev server which port to use.
+    This only works in Unix so we use cross-env package to let it work in Windows.
+
+    [Ref] https://www.npmjs.com/package/cross-env
+
+5.  Make Spring-Boot to accept token.
+
+    [Tutorial] https://auth0.com/blog/securing-spring-boot-with-jwts/
+    [Github] https://github.com/DylanMeeus/springboot_jwt_blog
+
+6.  We got "Response for preflight is invalid" error in ajax call.
+
+    The ajax call first attempt to send an OPTIONS message (the preflight message) to the server
+    to validate if this resource is safe before sending actual request with security token.
+
+    The preflight method should be OPTIONS and headers look like this (and their requirements):
+
+        Host: localhost
+        Connection: keep-alive
+        Access-Control-Request-Method: GET <---------------------- should not be null
+        Origin: http://localhost:3000 <--------------------------- should not be null
+        User-Agent: Mozilla/5.0 (Windows NT 10.0; Win...
+        Access-Control-Request-Headers: authorization
+        Accept: */*
+        Referer: http://localhost:3000/
+        Accept-Encoding: gzip, deflate, sdch, br
+        Accept-Language: en-US,en;q=0.8,zh-CN;q=0.6,zh-TW;q=0.4
+
+    We see it is sent to spring-boot api server but somehow, it is not processed as preflight message.
+
+    Adding @CrossOrigin in controller will allow CORS call but it doesn't seem to be this problem.
+
+    [Ref] https://spring.io/blog/2015/06/08/cors-support-in-spring-framework
+    [Ref] http://docs.spring.io/spring/docs/current/spring-framework-reference/html/cors.html
+
+    Here is the test:
+        1) Use Spring Security but in WebSecurityConfigurerAdapter, leave configure empty,
+           which means, no protection.
+
+                @Override
+                protected void configure(HttpSecurity http) throws Exception { }
+
+           This will work.
+
+        2) Add one line in configurate, to protect all resources:
+        
+                http.authorizeRequests().anyRequest().authenticated();
+
+           It show the error:
+                Fetch API cannot load http://localhost/firefighter/customers.
+                Redirect from 'http://localhost/firefighter/customers' to 'http://localhost/login'
+                has been blocked by CORS policy: Request requires preflight, which is disallowed to 
+                follow cross-origin redirect.
+
+           Check the server, we see a request method OPTIONS is blocked.
+
+        3) Add a CorsFilter like this:
+
+                public class CorsFilter extends OncePerRequestFilter {
+                    @Override
+                    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+                        if ("OPTIONS".equals(request.getMethod())) {
+                            response.setHeader("Access-Control-Allow-Origin", "*");
+                            response.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+                            response.setHeader("Access-Control-Max-Age", "3600");
+                            response.setHeader("Access-Control-Allow-Headers", "authorization, content-type, xsrf-token");
+                            response.addHeader("Access-Control-Expose-Headers", "xsrf-token");
+                            response.setStatus(HttpServletResponse.SC_OK);
+                        } else {
+                            filterChain.doFilter(request, response);
+                        }
+                    }
+                }
+
+           And add it:
+
+                http.addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class);
+
+        4) Check the server, we see the request header:
+
+                Host: localhost
+                Connection: keep-alive
+                User-Agent: Mozilla/5.0 (Windows NT 10.0; Wi...
+                Origin: http://localhost:3000
+                authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiI...
+                Accept: */*
+                Referer: http://localhost:3000/
+                Accept-Encoding: gzip, deflate, sdch, br
+                Accept-Language: en-US,en;q=0.8,zh-CN;q=0.6,zh-TW;q=0.4
+                ]
+
+           So out token did arrive the server side.
+           Now the question is to use that token and authorize the request.
+
+7.  Now we have our front-end to use AzureAD and can acquire a valid JWT token.
+    We also be able to let front-end send this token in "Authority" section in http header.
+    We can retrieve this token from the http request in our back-end.
+    Now we want to retrieve the information in this token and verify it.
+
+    Base on this article https://docs.microsoft.com/en-us/azure/active-directory/develop/active-directory-token-and-claims
+    The JWT token issued by AzureAD is encoded in RSA 256.
+    
+    We should go to here: https://login.microsoftonline.com/common/.well-known/openid-configuration
+    and check the value of "jwks_uri",
+    which is "https://login.microsoftonline.com/common/discovery/keys"
+    and check "kid" value in our JWT header...
+    (We can manually decode JWT token at https://jwt.io/ by copy'n'paste)
+    to select the public key used to sign this token.
+    (There are about three keys which are rotated about everyday.)
+
+</pre>
