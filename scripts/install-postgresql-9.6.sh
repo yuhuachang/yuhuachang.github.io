@@ -11,9 +11,14 @@
 ################################################################################
 
 # default database name, user, and password for application to access.
-DB_DATABASE="morrison"
-DB_USER="morrison"
-DB_PASSWORD="morrison"
+DB_DATABASE=$1
+DB_USER=$2
+DB_PASSWORD=$3
+
+if [ "$DB_DATABASE" == "" or "$DB_USER" == "" or "$DB_PASSWORD" == "" ]; then
+    echo "usage $0 <databbase> <user> <password>"
+    exit
+fi
 
 #
 # skip the installation if is installed already.
@@ -45,16 +50,15 @@ sudo grep listen_addresses /var/lib/pgsql/9.6/data/postgresql.conf
 # allow password login from localhost.
 #
 echo "Enable login from 127.0.0.1"
-#sed -i "s/all             127.0.0.1\/32            ident/all             127.0.0.1\/32            md5/g" /var/lib/pgsql/9.6/data/pg_hba.conf
-#sed -i "s/all             127.0.0.1\/32            ident/all             127.0.0.1\/32            md5/" /var/lib/pgsql/9.6/data/pg_hba.conf
-#sudo grep 127.0.0.1 /var/lib/pgsql/9.6/data/pg_hba.conf
+sudo sed -i "s/all             127.0.0.1\/32            ident/all             127.0.0.1\/32            md5/" /var/lib/pgsql/9.6/data/pg_hba.conf
+sudo grep 127.0.0.1 /var/lib/pgsql/9.6/data/pg_hba.conf
 
 #
 # allow password login from outside.
 #
-#HOST_ADDR=`ip a | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $2}'`
-#echo "Enable login from $HOST_ADDR"
-#sed -i -e 's#.*IPv4 local connections.*#\# IPv4 local connections:\nhost    all             all             '${HOST_ADDR}'        md5#' /var/lib/pgsql/9.5/data/pg_hba.conf
+HOST_ADDR=`ip a | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $2}'`
+echo "Enable login from $HOST_ADDR"
+sed -i -e 's#.*IPv4 local connections.*#\# IPv4 local connections:\nhost    all             all             '${HOST_ADDR}'        md5#' /var/lib/pgsql/9.6/data/pg_hba.conf
 
 #echo 'Adjust Firewall'
 #firewall-cmd --permanent --add-service=postgresql
@@ -100,9 +104,3 @@ sudo su - postgres -c "psql -c 'select * from pg_user'"
 echo "Store password in ~/.pgpass"
 echo "*:5432:$DB_DATABASE:$DB_USER:$DB_PASSWORD" > ~/.pgpass
 chmod 0600 ~/.pgpass
-
-#psql -h 127.0.0.1 -p 5432 -U tkk -d tkk -c "select * from information_schema.role_table_grants where grantee='tkk'"
-#psql -h 127.0.0.1 -p 5432 -U tkk -d tkk -c "select count(*) from information_schema.tables"
-#psql -h 127.0.0.1 -p 5432 -U tkk -d tkk -c "create table abc ( id int )"
-#psql -h 127.0.0.1 -p 5432 -U tkk -d tkk -c "select * from abc"
-#psql -h 127.0.0.1 -p 5432 -U tkk -d tkk -c "drop table abc"
