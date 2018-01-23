@@ -51,14 +51,17 @@ sudo grep listen_addresses /var/lib/pgsql/9.6/data/postgresql.conf
 #
 echo "Enable login from 127.0.0.1"
 sudo sed -i "s/all             127.0.0.1\/32            ident/all             127.0.0.1\/32            md5/" /var/lib/pgsql/9.6/data/pg_hba.conf
+sudo sed -i "s/all             127.0.0.1\/32            ident/all             0.0.0.0\/0               md5/" /var/lib/pgsql/9.6/data/pg_hba.conf
 sudo grep 127.0.0.1 /var/lib/pgsql/9.6/data/pg_hba.conf
 
 #
 # allow password login from outside.
 #
-HOST_ADDR=`ip a | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $2}'`
-echo "Enable login from $HOST_ADDR"
-sed -i -e 's#.*IPv4 local connections.*#\# IPv4 local connections:\nhost    all             all             '${HOST_ADDR}'        md5#' /var/lib/pgsql/9.6/data/pg_hba.conf
+HOST_ADDRS=`ip a | grep 'inet ' | grep -v '127.0.0.1' | awk '{print $2}'`
+for HOST_ADDR in $HOST_ADDRS; do
+    echo "Enable login from $HOST_ADDR"
+    sudo sed -i -e 's#.*IPv4 local connections.*#\# IPv4 local connections:\nhost    all             all             '${HOST_ADDR}'        md5#' /var/lib/pgsql/9.6/data/pg_hba.conf
+done
 
 #echo 'Adjust Firewall'
 #firewall-cmd --permanent --add-service=postgresql
