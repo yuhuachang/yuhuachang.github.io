@@ -18,20 +18,13 @@
             <h4 class="card-header">Featured</h4>
             <div class="card-body">
               <h4 class="card-title">Install PostgreSQL 9.6 Server</h4>
-              <p class="card-text">Tested on CentOS 7</p>
-              <pre class="alert alert-secondary">
-curl https://yuhuachang.github.io/scripts/install-postgresql-9.6.sh -o install-postgresql-9.6.sh
-chmod 755 install-postgresql-9.6.sh
-./install-postgresql-9.6.sh
-              </pre>
               <p class="card-text">
+                <a href="/vagrant/postgresql">Vagrant file</a> for CentOS 7.
+                (Rename it to Vagrantfile under vagrant box folder)
                 Run SQL and validate connectivity.
               </p>
               <pre class="alert alert-secondary">
-psql -h 127.0.0.1 -p 5432 -U user -d database -c "select * from information_schema.tables"
-              </pre>
-              <pre class="alert alert-secondary">
-psql -h 127.0.0.1 -p 5432 -U morrison -d morrison -c "select * from information_schema.tables"
+psql -h 127.0.0.1 -p 5432 -U user1 -d db1 -c "select * from information_schema.tables"
               </pre>
             </div>
           </div>

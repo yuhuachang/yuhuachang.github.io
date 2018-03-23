@@ -10,16 +10,6 @@
 #
 ################################################################################
 
-# default database name, user, and password for application to access.
-DB_DATABASE=$1
-DB_USER=$2
-DB_PASSWORD=$3
-
-if [ "$DB_DATABASE" == "" or "$DB_USER" == "" or "$DB_PASSWORD" == "" ]; then
-    echo "usage $0 <databbase> <user> <password>"
-    exit
-fi
-
 #
 # skip the installation if is installed already.
 #
@@ -83,27 +73,3 @@ sudo systemctl enable postgresql-9.6
 echo 'Start PostgreSQL service'
 sudo systemctl restart postgresql-9.6
 sudo systemctl status postgresql-9.6
-
-#
-# create database
-#
-echo "Create database '$DB_DATABASE'"
-sudo su - postgres -c "dropdb $DB_DATABASE" 2>/dev/null
-sudo su - postgres -c "createdb $DB_DATABASE"
-sudo su - postgres -c "psql --list"
-
-#
-# create user
-#
-echo "Create user '$DB_USER' with password '$DB_PASSWORD'"
-sudo su - postgres -c "dropuser $DB_USER" 2>/dev/null
-sudo su - postgres -c "createuser --encrypted --no-createdb --no-createrole --no-superuser --no-replication $DB_USER"
-sudo su - postgres -c "psql -c \"alter user $DB_USER password '$DB_PASSWORD'\""
-sudo su - postgres -c "psql -c 'select * from pg_user'"
-
-#
-# store password
-#
-echo "Store password in ~/.pgpass"
-echo "*:5432:$DB_DATABASE:$DB_USER:$DB_PASSWORD" > ~/.pgpass
-chmod 0600 ~/.pgpass

@@ -129,19 +129,19 @@ https://jwt.io/
 //            System.out.println("e: " + e);
 //            System.out.println("x5c: " + x5c);
 
-            String keyStr = "-----BEGIN CERTIFICATE-----\r\n";
+            String keyStr = "-----BEGIN CERTIFICATE-----\n";
             String tmp = x5c;
             while (tmp.length() > 0) {
                 if (tmp.length() > 64) {
                     String x = tmp.substring(0, 64);
-                    keyStr += x + "\r\n";
+                    keyStr += x + "\n";
                     tmp = tmp.substring(64);
                 } else {
-                    keyStr += tmp + "\r\n";
+                    keyStr += tmp + "\n";
                     tmp = "";
                 }
             }
-            keyStr += "-----END CERTIFICATE-----\r\n";
+            keyStr += "-----END CERTIFICATE-----\n";
 //            System.out.println(keyStr);
             /*
              * go to https://jwt.io/ and copy'n'paste the thow jwt token to the left side, it will be decoded on the right side,
