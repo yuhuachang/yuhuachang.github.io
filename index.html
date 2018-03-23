@@ -17,15 +17,24 @@
           <div class="card">
             <h4 class="card-header">Featured</h4>
             <div class="card-body">
+
+              <!-- PostgreSQL -->
               <h4 class="card-title">Install PostgreSQL 9.6 Server</h4>
               <p class="card-text">
-                <a href="/vagrant/postgresql">Vagrant file</a> for CentOS 7.
-                (Rename it to Vagrantfile under vagrant box folder)
+                <a href="/vagrant/postgresql/Vagrantfile">Vagrant file</a> for CentOS 7.
                 Run SQL and validate connectivity.
               </p>
               <pre class="alert alert-secondary">
 psql -h 127.0.0.1 -p 5432 -U user1 -d db1 -c "select * from information_schema.tables"
               </pre>
+
+              <!-- ActiveMQ -->
+              <h4 class="card-title">Install PostgreSQL 9.6 Server</h4>
+              <p class="card-text">
+                <a href="/vagrant/activemq/Vagrantfile">Vagrant file</a> for CentOS 7.
+                Default admin page http://<your-ip>:8161/ with default username "admin" and password "admin".
+              </p>
+
             </div>
           </div>
         </div>
