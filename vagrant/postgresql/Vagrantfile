@@ -65,11 +65,12 @@ Vagrant.configure("2") do |config|
   # Puppet, Chef, Ansible, Salt, and Docker are also available. Please see the
   # documentation for more information about their specific syntax and use.
   config.vm.provision "shell", inline: <<-SHELL
-    curl https://yuhuachang.github.io/scripts/install-postgresql-9.6.sh -o ~/install-postgresql-9.6.sh
+    mkdir ~/bin
+    curl https://yuhuachang.github.io/scripts/install-postgresql-9.6.sh -o ~/bin/install-postgresql-9.6.sh
     curl https://yuhuachang.github.io/scripts/create-database.sh -o ~/bin/create-database.sh
     curl https://yuhuachang.github.io/scripts/create-user.sh -o ~/bin/create-user.sh
-    chmod 755 install-postgresql-9.6.sh
-    ~/install-postgresql-9.6.sh
+    chmod 755 ~/bin/*
+    install-postgresql-9.6.sh
     create-database db1
     create-database db2
     create-user user1 user1
