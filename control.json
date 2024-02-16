@@ -29,13 +29,13 @@
       "port": 80,
       "gpio": {
         "3": {
-          "control": "404CCAF4E110",
+          "control": "28CDC105A7FD",
           "relay": [
             "1"
           ]
         },
         "4": {
-          "control": "404CCAF4E110",
+          "control": "28CDC105A7FD",
           "relay": [
             "1",
             "10",
