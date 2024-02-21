@@ -76,6 +76,7 @@
   },
   "switch-panel": {
     "404CCAF4E110": {
+      "name": "Test Switch Panel",
       "mac": "40:4C:CA:F4:E1:10",
       "ip": "192.168.0.222",
       "port": 80,
