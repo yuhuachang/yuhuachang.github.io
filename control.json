@@ -75,6 +75,26 @@
     }
   },
   "switch-panel": {
+    "404CCAF4E924": {
+      "name": "Bathroom",
+      "mac": "40:4C:CA:F4:E9:24",
+      "ip": "192.168.0.142",
+      "port": 80,
+      "gpio": {
+        "8": {
+          "control": "28CDC105A763",
+          "relay": [
+            "5"
+          ]
+        },
+        "20": {
+          "control": "28CDC105A763",
+          "relay": [
+            "7"
+          ]
+        }
+      }
+    },
     "404CCAF4E110": {
       "name": "Test Switch Panel",
       "mac": "40:4C:CA:F4:E1:10",
