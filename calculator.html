@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script>
+    const tokenize = inputText => {
+      let numberText = "";
+      const tokens = [];
+
+      for (let i = 0; i < inputText.length; i++) {
+        const c = inputText.charAt(i);
+        if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."].includes(c)) {
+          numberText += c;
+        } else if ([" "].includes(c)) {
+          if (numberText.length > 0) {
+            tokens.push(numberText);
+            numberText = "";
+          }
+        } else if (["+", "-", "*", "/", "(", ")"].includes(c)) {
+          if (numberText.length > 0) {
+            tokens.push(numberText);
+            numberText = "";
+          }
+          tokens.push(c);
+        }
+      }
+      if (numberText.length > 0) {
+        tokens.push(numberText);
+      }
+      return tokens;
+    };
+
+    const isNumber = c => {
+      try {
+        parseFloat(c);
+      } catch {
+        return false;
+      }
+      return true;
+    };
+
+    const isExpression = (left, operator, right) => {
+      // console.log(`${left} (${left.constructor.name}) ${operator} (${operator.constructor.name}) ${right} (${right.constructor.name})`);
+      if (!(left instanceof Number || left instanceof Expression)) return false;
+      if (!(operator instanceof Operator)) return false;
+      if (!(right instanceof Number || right instanceof Expression)) return false;
+      return true;
+    };
+
+    const isPlusOrMinusExpression = (left, operator, right) => {
+      if (!isExpression(left, operator, right)) return false;
+      return ["+", "-"].includes(operator.sign);
+    };
+
+    const isMultiplyOrDivideExpression = (left, operator, right) => {
+      if (!isExpression(left, operator, right)) return false;
+      return ["*", "/"].includes(operator.sign);
+    };
+
+    class Number {
+      constructor(c) {
+        this.value = parseFloat(c);
+      }
+      evaluate() {
+        return this.value;
+      }
+      toString() {
+        return `${this.value}`;
+      }
+    }
+
+    class Operator {
+      constructor(c) {
+        this.sign = c;
+      }
+      toString() {
+        return this.sign;
+      }
+    }
+
+    class Expression {
+      constructor(left, operator, right) {
+        this.left = left;
+        this.operator = operator;
+        this.right = right;
+      }
+      evaluate() {
+        if (this.operator.sign === "+") return this.left.evaluate() + this.right.evaluate();
+        if (this.operator.sign === "-") return this.left.evaluate() - this.right.evaluate();
+        if (this.operator.sign === "*") return this.left.evaluate() * this.right.evaluate();
+        if (this.operator.sign === "/") return this.left.evaluate() / this.right.evaluate();
+      }
+      toString() {
+        return `(${this.left.toString()}${this.operator.toString()}${this.right.toString()})`;
+      }
+    }
+
+    const buildAst = inputText => {
+      // console.log(">>>" + inputText + "<<<");
+
+      const tokens = tokenize(inputText);
+      // console.log(tokens);
+
+      const buildBlock = () => {
+        // console.log(`new block: ${tokens}`);
+
+        const print = x => {
+          let s = "[";
+          for (let i = 0; i < x.length; i++) {
+            s += `(${i})${x[i].toString()} `;
+          }
+          s += "]";
+          return s;
+        };
+
+        const temp = [];
+        while (tokens.length > 0) {
+          const c = tokens.shift();
+          if (c === "(") {
+            const o = buildBlock();
+            temp.push(o);
+          } else if (c === ")") {
+            break;
+          } else if (["+", "-", "*", "/"].includes(c)) {
+            const o = new Operator(c);
+            temp.push(o);
+          } else if (isNumber(c)) {
+            const o = new Number(c);
+            temp.push(o);
+          }
+        }
+        // console.log(`one: ${print(temp)}`);
+
+        for (let i = 0; i < temp.length;) {
+          if (i <= temp.length - 3 && isMultiplyOrDivideExpression(temp[i], temp[i + 1], temp[i + 2])) {
+            const o = new Expression(temp[i], temp[i + 1], temp[i + 2]);
+            // console.log(`expression*: ${o.toString()}`);
+            temp.splice(i, 3, o);
+            // console.log(`two: ${print(temp)}`);
+          } else {
+            i++;
+          }
+        }
+        // console.log(`two: ${print(temp)}`);
+
+        for (let i = 0; i < temp.length;) {
+          if (i <= temp.length - 3 && isPlusOrMinusExpression(temp[i], temp[i + 1], temp[i + 2])) {
+            const o = new Expression(temp[i], temp[i + 1], temp[i + 2]);
+            // console.log(`expression*: ${o.toString()}`);
+            temp.splice(i, 3, o);
+            // console.log(`three: ${i} < ${temp.length} ${print(temp)}`);
+          } else {
+            i++;
+          }
+        }
+        // console.log(`three: ${print(temp)}`);
+
+        if (temp.length === 1 && temp[0] instanceof Expression) {
+          return temp[0];
+        }
+        return null;
+      };
+
+      return buildBlock();
+    };
+
+    document.addEventListener("DOMContentLoaded", () => {
+      const inputComponent = document.getElementById("input");
+
+      input.addEventListener("input", e => {
+        // console.log(e);
+
+        const inputText = e.target.value;
+        // console.log(">>>" + inputText + "<<<");
+
+        const ast = buildAst(inputText);
+        if (ast) {
+          // console.log(ast);
+
+          const answer = ast.evaluate();
+          // console.log(answer);
+
+          if (answer) {
+            const answerComponent = document.getElementById("answer");
+            answerComponent.innerText = `${ast.toString()} = ${answer}`;
+          }
+        }
+      });
+
+      input.addEventListener("keydown", e => {
+        // console.log(e);
+
+        if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(e.key)) {
+          // okay
+        } else if ([".", "+", "-", "*", "/", "(", ")"].includes(e.key)) {
+          // okay
+        } else if (["Enter", " ", "Backspace", "Delete"].includes(e.key)) {
+          // okay
+        } else if (["ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight", "Home", "End"].includes(e.key)) {
+          // okay
+        } else {
+          e.preventDefault();
+        }
+      });
+
+      inputComponent.focus();
+    });
+  </script>
+</head>
+
+<body>
+  <div id="answer" style="font-family: monospace; font-size: 36px;"></div>
+  <textarea id="input"style="font-family: monospace; font-size: 36px; width: 100%; height: 150px;">1 + 2 * 3</textarea>
+</body>
+
+</html>
