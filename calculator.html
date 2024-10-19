@@ -2,236 +2,237 @@
 <html>
 
 <head>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
-    integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
+        integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
 
-  <!-- The loading of KaTeX is deferred to speed up page rendering -->
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
-    integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg"
-    crossorigin="anonymous"></script>
+    <!-- The loading of KaTeX is deferred to speed up page rendering -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
+        integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg"
+        crossorigin="anonymous"></script>
 
-  <!-- To automatically render math in text elements, include the auto-render extension: -->
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
-    integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"
-    onload="renderMathInElement(document.body);"></script>
+    <!-- To automatically render math in text elements, include the auto-render extension: -->
+    <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
+        integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"
+        onload="renderMathInElement(document.body);"></script>
 
-  <script>
-    const tokenize = inputText => {
-      let numberText = "";
-      const tokens = [];
+    <script>
+        const tokenize = inputText => {
+            let numberText = "";
+            const tokens = [];
 
-      for (let i = 0; i < inputText.length; i++) {
-        const c = inputText.charAt(i);
-        if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."].includes(c)) {
-          numberText += c;
-        } else if ([" "].includes(c)) {
-          if (numberText.length > 0) {
-            tokens.push(numberText);
-            numberText = "";
-          }
-        } else if (["+", "-", "*", "/", "(", ")"].includes(c)) {
-          if (numberText.length > 0) {
-            tokens.push(numberText);
-            numberText = "";
-          }
-          tokens.push(c);
-        }
-      }
-      if (numberText.length > 0) {
-        tokens.push(numberText);
-      }
-      return tokens;
-    };
-
-    const isNumber = c => {
-      try {
-        parseFloat(c);
-      } catch {
-        return false;
-      }
-      return true;
-    };
-
-    const isExpression = (left, operator, right) => {
-      // console.log(`${left} (${left.constructor.name}) ${operator} (${operator.constructor.name}) ${right} (${right.constructor.name})`);
-      if (!(left instanceof Number || left instanceof Expression)) return false;
-      if (!(operator instanceof Operator)) return false;
-      if (!(right instanceof Number || right instanceof Expression)) return false;
-      return true;
-    };
-
-    const isPlusOrMinusExpression = (left, operator, right) => {
-      if (!isExpression(left, operator, right)) return false;
-      return ["+", "-"].includes(operator.sign);
-    };
-
-    const isMultiplyOrDivideExpression = (left, operator, right) => {
-      if (!isExpression(left, operator, right)) return false;
-      return ["*", "/"].includes(operator.sign);
-    };
-
-    class Number {
-      constructor(c) {
-        this.value = parseFloat(c);
-      }
-      evaluate() {
-        return this.value;
-      }
-      toString() {
-        return `${this.value}`;
-      }
-    }
-
-    class Operator {
-      constructor(c) {
-        this.sign = c;
-      }
-      toString() {
-        if (this.sign === "*") {
-          return "\\times";
-        } else if (this.sign === "/") {
-          return "\\div";
-        }
-        return this.sign;
-      }
-    }
-
-    class Expression {
-      constructor(left, operator, right) {
-        this.left = left;
-        this.operator = operator;
-        this.right = right;
-      }
-      evaluate() {
-        if (this.operator.sign === "+") return this.left.evaluate() + this.right.evaluate();
-        if (this.operator.sign === "-") return this.left.evaluate() - this.right.evaluate();
-        if (this.operator.sign === "*") return this.left.evaluate() * this.right.evaluate();
-        if (this.operator.sign === "/") return this.left.evaluate() / this.right.evaluate();
-      }
-      toString() {
-        return `(${this.left.toString()}${this.operator.toString()}${this.right.toString()})`;
-      }
-    }
-
-    const buildAst = inputText => {
-      // console.log(">>>" + inputText + "<<<");
-
-      const tokens = tokenize(inputText);
-      // console.log(tokens);
-
-      const buildBlock = () => {
-        // console.log(`new block: ${tokens}`);
-
-        const print = x => {
-          let s = "[";
-          for (let i = 0; i < x.length; i++) {
-            s += `(${i})${x[i].toString()} `;
-          }
-          s += "]";
-          return s;
+            for (let i = 0; i < inputText.length; i++) {
+                const c = inputText.charAt(i);
+                if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."].includes(c)) {
+                    numberText += c;
+                } else if ([" "].includes(c)) {
+                    if (numberText.length > 0) {
+                        tokens.push(numberText);
+                        numberText = "";
+                    }
+                } else if (["+", "-", "*", "/", "(", ")"].includes(c)) {
+                    if (numberText.length > 0) {
+                        tokens.push(numberText);
+                        numberText = "";
+                    }
+                    tokens.push(c);
+                }
+            }
+            if (numberText.length > 0) {
+                tokens.push(numberText);
+            }
+            return tokens;
         };
 
-        const temp = [];
-        while (tokens.length > 0) {
-          const c = tokens.shift();
-          if (c === "(") {
-            const o = buildBlock();
-            temp.push(o);
-          } else if (c === ")") {
-            break;
-          } else if (["+", "-", "*", "/"].includes(c)) {
-            const o = new Operator(c);
-            temp.push(o);
-          } else if (isNumber(c)) {
-            const o = new Number(c);
-            temp.push(o);
-          }
+        const isNumber = c => {
+            try {
+                parseFloat(c);
+            } catch {
+                return false;
+            }
+            return true;
+        };
+
+        const isExpression = (left, operator, right) => {
+            // console.log(`${left} (${left.constructor.name}) ${operator} (${operator.constructor.name}) ${right} (${right.constructor.name})`);
+            if (!(left instanceof Number || left instanceof Expression)) return false;
+            if (!(operator instanceof Operator)) return false;
+            if (!(right instanceof Number || right instanceof Expression)) return false;
+            return true;
+        };
+
+        const isPlusOrMinusExpression = (left, operator, right) => {
+            if (!isExpression(left, operator, right)) return false;
+            return ["+", "-"].includes(operator.sign);
+        };
+
+        const isMultiplyOrDivideExpression = (left, operator, right) => {
+            if (!isExpression(left, operator, right)) return false;
+            return ["*", "/"].includes(operator.sign);
+        };
+
+        class Number {
+            constructor(c) {
+                this.value = parseFloat(c);
+            }
+            evaluate() {
+                return this.value;
+            }
+            toString() {
+                return `${this.value}`;
+            }
         }
-        // console.log(`one: ${print(temp)}`);
 
-        for (let i = 0; i < temp.length;) {
-          if (i <= temp.length - 3 && isMultiplyOrDivideExpression(temp[i], temp[i + 1], temp[i + 2])) {
-            const o = new Expression(temp[i], temp[i + 1], temp[i + 2]);
-            // console.log(`expression*: ${o.toString()}`);
-            temp.splice(i, 3, o);
-            // console.log(`two: ${print(temp)}`);
-          } else {
-            i++;
-          }
+        class Operator {
+            constructor(c) {
+                this.sign = c;
+            }
+            toString() {
+                if (this.sign === "*") {
+                    return "\\times";
+                } else if (this.sign === "/") {
+                    return "\\div";
+                }
+                return this.sign;
+            }
         }
-        // console.log(`two: ${print(temp)}`);
 
-        for (let i = 0; i < temp.length;) {
-          if (i <= temp.length - 3 && isPlusOrMinusExpression(temp[i], temp[i + 1], temp[i + 2])) {
-            const o = new Expression(temp[i], temp[i + 1], temp[i + 2]);
-            // console.log(`expression*: ${o.toString()}`);
-            temp.splice(i, 3, o);
-            // console.log(`three: ${i} < ${temp.length} ${print(temp)}`);
-          } else {
-            i++;
-          }
+        class Expression {
+            constructor(left, operator, right) {
+                this.left = left;
+                this.operator = operator;
+                this.right = right;
+            }
+            evaluate() {
+                if (this.operator.sign === "+") return this.left.evaluate() + this.right.evaluate();
+                if (this.operator.sign === "-") return this.left.evaluate() - this.right.evaluate();
+                if (this.operator.sign === "*") return this.left.evaluate() * this.right.evaluate();
+                if (this.operator.sign === "/") return this.left.evaluate() / this.right.evaluate();
+            }
+            toString() {
+                return `(${this.left.toString()}${this.operator.toString()}${this.right.toString()})`;
+            }
         }
-        // console.log(`three: ${print(temp)}`);
 
-        if (temp.length === 1 && temp[0] instanceof Expression) {
-          return temp[0];
-        }
-        return null;
-      };
+        const buildAst = inputText => {
+            // console.log(">>>" + inputText + "<<<");
 
-      return buildBlock();
-    };
+            const tokens = tokenize(inputText);
+            // console.log(tokens);
 
-    const calculate = () => {
-      const inputComponent = document.getElementById("input");
-      const inputText = inputComponent.value;
-      // console.log(">>>" + inputText + "<<<");
+            const buildBlock = () => {
+                // console.log(`new block: ${tokens}`);
 
-      const ast = buildAst(inputText);
-      if (ast) {
-        // console.log(ast);
+                const print = x => {
+                    let s = "[";
+                    for (let i = 0; i < x.length; i++) {
+                        s += `(${i})${x[i].toString()} `;
+                    }
+                    s += "]";
+                    return s;
+                };
 
-        const answer = ast.evaluate();
-        console.log(answer);
+                const temp = [];
+                while (tokens.length > 0) {
+                    const c = tokens.shift();
+                    if (c === "(") {
+                        const o = buildBlock();
+                        temp.push(o);
+                    } else if (c === ")") {
+                        break;
+                    } else if (["+", "-", "*", "/"].includes(c)) {
+                        const o = new Operator(c);
+                        temp.push(o);
+                    } else if (isNumber(c)) {
+                        const o = new Number(c);
+                        temp.push(o);
+                    }
+                }
+                // console.log(`one: ${print(temp)}`);
 
-        if (answer) {
-          const answerComponent = document.getElementById("answer");
-          katex.render(`${ast.toString()} = ${answer}`, answerComponent, {
-            throwOnError: false
-          });
-        }
-      }
-    };
+                for (let i = 0; i < temp.length;) {
+                    if (i <= temp.length - 3 && isMultiplyOrDivideExpression(temp[i], temp[i + 1], temp[i + 2])) {
+                        const o = new Expression(temp[i], temp[i + 1], temp[i + 2]);
+                        // console.log(`expression*: ${o.toString()}`);
+                        temp.splice(i, 3, o);
+                        // console.log(`two: ${print(temp)}`);
+                    } else {
+                        i++;
+                    }
+                }
+                // console.log(`two: ${print(temp)}`);
 
-    document.addEventListener("DOMContentLoaded", () => {
-      const inputComponent = document.getElementById("input");
+                for (let i = 0; i < temp.length;) {
+                    if (i <= temp.length - 3 && isPlusOrMinusExpression(temp[i], temp[i + 1], temp[i + 2])) {
+                        const o = new Expression(temp[i], temp[i + 1], temp[i + 2]);
+                        // console.log(`expression*: ${o.toString()}`);
+                        temp.splice(i, 3, o);
+                        // console.log(`three: ${i} < ${temp.length} ${print(temp)}`);
+                    } else {
+                        i++;
+                    }
+                }
+                // console.log(`three: ${print(temp)}`);
 
-      inputComponent.addEventListener("input", calculate);
+                if (temp.length === 1 && temp[0] instanceof Expression) {
+                    return temp[0];
+                }
+                return null;
+            };
 
-      inputComponent.addEventListener("keydown", e => {
-        if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(e.key)) {
-          // okay
-        } else if ([".", "+", "-", "*", "/", "(", ")"].includes(e.key)) {
-          // okay
-        } else if (["Enter", " ", "Backspace", "Delete"].includes(e.key)) {
-          // okay
-        } else if (["ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight", "Home", "End"].includes(e.key)) {
-          // okay
-        } else {
-          e.preventDefault();
-        }
-      });
+            return buildBlock();
+        };
 
-      calculate();
+        const calculate = () => {
+            const inputComponent = document.getElementById("input");
+            const inputText = inputComponent.value;
+            // console.log(">>>" + inputText + "<<<");
 
-      inputComponent.focus();
-    });
-  </script>
+            const ast = buildAst(inputText);
+            if (ast) {
+                // console.log(ast);
+
+                const answer = ast.evaluate();
+                // console.log(answer);
+
+                if (answer) {
+                    const answerComponent = document.getElementById("answer");
+                    katex.render(`${ast.toString()} = ${answer}`, answerComponent, {
+                        throwOnError: false
+                    });
+                }
+            }
+        };
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const inputComponent = document.getElementById("input");
+
+            inputComponent.addEventListener("input", calculate);
+
+            inputComponent.addEventListener("keydown", e => {
+                if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(e.key)) {
+                    // okay
+                } else if ([".", "+", "-", "*", "/", "(", ")"].includes(e.key)) {
+                    // okay
+                } else if (["Enter", " ", "Backspace", "Delete"].includes(e.key)) {
+                    // okay
+                } else if (["ArrowUp", "ArrowLeft", "ArrowDown", "ArrowRight", "Home", "End"].includes(e.key)) {
+                    // okay
+                } else {
+                    e.preventDefault();
+                }
+            });
+
+            calculate();
+
+            inputComponent.focus();
+        });
+    </script>
 </head>
 
 <body>
-  <div id="answer" style="font-family: monospace; font-size: 36px;"></div>
-  <textarea id="input" style="font-family: monospace; font-size: 36px; width: 100%; height: 150px;">1 + 2 * 3</textarea>
+    <div id="answer" style="font-family: monospace; font-size: 36px;"></div>
+    <textarea id="input"
+        style="font-family: monospace; font-size: 36px; width: 100%; height: 150px;">1 + 2 * 3</textarea>
 </body>
 
 </html>
