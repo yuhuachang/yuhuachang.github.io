@@ -87,6 +87,11 @@
         this.sign = c;
       }
       toString() {
+        if (this.sign === "*") {
+          return "\\times";
+        } else if (this.sign === "/") {
+          return "\\div";
+        }
         return this.sign;
       }
     }
@@ -177,36 +182,33 @@
       return buildBlock();
     };
 
+    const calculate = () => {
+      const inputComponent = document.getElementById("input");
+      const inputText = inputComponent.value;
+      // console.log(">>>" + inputText + "<<<");
+
+      const ast = buildAst(inputText);
+      if (ast) {
+        // console.log(ast);
+
+        const answer = ast.evaluate();
+        console.log(answer);
+
+        if (answer) {
+          const answerComponent = document.getElementById("answer");
+          katex.render(`${ast.toString()} = ${answer}`, answerComponent, {
+            throwOnError: false
+          });
+        }
+      }
+    };
+
     document.addEventListener("DOMContentLoaded", () => {
       const inputComponent = document.getElementById("input");
 
-      input.addEventListener("input", e => {
-        // console.log(e);
+      inputComponent.addEventListener("input", calculate);
 
-        const inputText = e.target.value;
-        // console.log(">>>" + inputText + "<<<");
-
-        const ast = buildAst(inputText);
-        if (ast) {
-          // console.log(ast);
-
-          const answer = ast.evaluate();
-          // console.log(answer);
-
-          if (answer) {
-            const answerComponent = document.getElementById("answer");
-            // answerComponent.innerText = `${ast.toString()} = ${answer}`;
-
-            katex.render(`${ast.toString()} = ${answer}`, answerComponent, {
-              throwOnError: false
-            });
-          }
-        }
-      });
-
-      input.addEventListener("keydown", e => {
-        // console.log(e);
-
+      inputComponent.addEventListener("keydown", e => {
         if (["0", "1", "2", "3", "4", "5", "6", "7", "8", "9"].includes(e.key)) {
           // okay
         } else if ([".", "+", "-", "*", "/", "(", ")"].includes(e.key)) {
@@ -219,6 +221,8 @@
           e.preventDefault();
         }
       });
+
+      calculate();
 
       inputComponent.focus();
     });
