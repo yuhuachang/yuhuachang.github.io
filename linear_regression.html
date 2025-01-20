@@ -6,30 +6,33 @@
     <title>Linear Regression</title>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
-        /* Center the canvas using Flexbox */
         body {
           display: inline-grid;
           margin: 20px;
         }
         canvas {
-          border: 1px solid black; /* Optional border for the canvas */
+          border: 1px solid black;
         }
       </style>
 </head>
 <body>
     <p>
         \[
-        Regression Line =
+        \Large
+        Regression Line \longrightarrow
         g(x) = ax + b
         \]
         \[
-        Squares Sum =
+        \Large
+        Squares Sum \longrightarrow
         \sum_i(ax_i + b - y_i)^2
         \]
         \[
+        \Large
         a = \frac{\sum_i{x_i y_i} - \sum_i{x_i}\sum_i{y_i}}{ \sum_i{x_i^2} - (\sum_i{x_i})^2 }
         \]
         \[
+        \Large
         b = \frac{1}{n} \sum_i{y_i} - a \frac{1}{n} \sum_i{x_i}
         \]
     </p>
