@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lines</title>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            display: inline-grid;
+            margin: 20px;
+        }
+
+        canvas {
+            border: 1px solid black;
+        }
+
+        input {
+            width: 400px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="curve"></div>
+    <div>
+        <label>a:
+            <input id="a-slider" type="range" min="-1" max="1" step="0.00001" value="0.0001">
+        </label>
+    </div>
+    <div>
+        <label>b:
+            <input id="b-slider" type="range" min="-10" max="10" step="0.0001" value="1">
+        </label>
+    </div>
+    <div>
+        <label>c:
+            <input id="c-slider" type="range" min="-250" max="250" step="1" value="0">
+        </label>
+    </div>
+    <canvas id="canvas" width="500" height="500"></canvas>
+    <script>
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        const _x = x => x + 250;
+        const _y = y => (y - 250) * -1;
+
+        const drawDot = (x, y, size, color) => {
+            ctx.beginPath();
+            ctx.arc(_x(x), _y(y), size, 0, Math.PI * 2); // Draw a circle at the point
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.closePath();
+        };
+
+        const drawLine = (x1, y1, x2, y2) => {
+            ctx.beginPath();
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 1;
+            ctx.moveTo(_x(x1), _y(y1));
+            ctx.lineTo(_x(x2), _y(y2));
+            ctx.stroke();
+            ctx.closePath();
+        };
+
+        const o = [
+            { "a": 0, "b": 0, "c": 0 }
+        ];
+
+        const curve = document.getElementById("curve");
+        const line = document.getElementById("line");
+        const intersection = document.getElementById("intersection");
+
+        const refresh = () => {
+
+            curve.textContent = `\\[ \\Large f(x) = a_1 x^2 + b_1 x + c_1 = ${o[0].a} x^2 ${o[0].b >= 0 ? '+' : ''} ${o[0].b} x ${o[0].c >= 0 ? '+' : ''} ${o[0].c} \\]`;
+            MathJax.typesetPromise([curve]).catch((err) => console.error(err));
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawLine(-250, 0, 250, 0);
+            drawLine(0, -250, 0, 250);
+
+            for (let x = -250; x <= 250; x += 1) {
+                y = o[0].a * (x * x) + o[0].b * x+ o[0].c;
+                drawDot(x, y, 2, "green");
+            }
+        };
+
+        document.getElementById("a-slider").addEventListener("input", e => {
+            o[0].a = parseFloat(e.target.value);
+            refresh();
+        });
+        document.getElementById("b-slider").addEventListener("input", e => {
+            o[0].b = parseFloat(e.target.value);
+            refresh();
+        });
+        document.getElementById("c-slider").addEventListener("input", e => {
+            o[0].c = parseFloat(e.target.value);
+            refresh();
+        });
+    </script>
+</body>
+
+</html>
