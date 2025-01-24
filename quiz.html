@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz</title>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        .container {
+          display: grid;
+          grid-template-columns: auto auto auto auto;
+          padding: 10px;
+        }
+        .container > div {
+          border: 0px;
+          padding: 10px;
+          font-size: 30px;
+          text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="quiz"></div>
+    <div class="container" id="answer"></div>
+    <script>
+        const quizList = [];
+        for (let i = 1; i <= 10; i++) {
+            const a = Math.floor(Math.random() * 100);
+            const b = Math.floor(Math.random() * 100);
+            if (a + b > 100) {
+                if (a >= b) {
+                    quizList.push([`${a} - ${b}`, (a - b)]);
+                } else {
+                    quizList.push([`${b} - ${a}`, (b - a)]);
+                }
+            } else {
+                quizList.push([`${a} + ${b}`, (a + b)]);
+            }
+        }
+
+        const paper = document.getElementById("quiz");
+
+        quizList.forEach(quiz => {
+            const node = document.createElement("div");
+            node.textContent = `
+\\[
+\\large
+${quiz[0]} =
+\\]
+`;
+            node.appendChild(document.createElement("br"));
+            node.appendChild(document.createElement("br"));
+            node.appendChild(document.createElement("br"));
+            paper.appendChild(node);
+            paper.appendChild(document.createElement("div"));
+        });
+
+        const answer = document.getElementById("answer");
+
+        quizList.forEach(quiz => {
+            const node = document.createElement("div");
+            node.textContent = `
+\\[
+\\large
+${quiz[0]} = ${quiz[1]}
+\\]
+`;
+            answer.appendChild(node);
+            answer.appendChild(document.createElement("div"));
+        });
+    </script>
+</body>
+</html>

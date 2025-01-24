@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,14 +8,16 @@
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         body {
-          display: inline-grid;
-          margin: 20px;
+            display: inline-grid;
+            margin: 20px;
         }
+
         canvas {
-          border: 1px solid black;
+            border: 1px solid black;
         }
-      </style>
+    </style>
 </head>
+
 <body>
     <p>
         \[
@@ -38,9 +41,9 @@
     </p>
     <canvas id="canvas" width="500" height="500"></canvas>
     <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-    
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
         const _x = x => x + 250;
         const _y = y => (y - 250) * -1;
 
@@ -54,7 +57,7 @@
 
         const drawLine = (x1, y1, x2, y2) => {
             ctx.beginPath();
-            ctx.strokeStyle = 'black';
+            ctx.strokeStyle = "black";
             ctx.lineWidth = 1;
             ctx.moveTo(_x(x1), _y(y1));
             ctx.lineTo(_x(x2), _y(y2));
@@ -64,7 +67,7 @@
 
         drawLine(-250, 0, 250, 0)
         drawLine(0, -250, 0, 250)
-        
+
         // Define an array of (x, y) points
         const points = [];
         for (let x = -250; x <= 250; x += 10) {
@@ -73,10 +76,10 @@
                 y: Math.random() * 150 - 100 + x / 2
             });
         }
-    
+
         // Draw the points on the canvas
-        points.forEach(p => drawDot(p.x, p.y, 'blue'));
-    
+        points.forEach(p => drawDot(p.x, p.y, "blue"));
+
         let sum_x = 0;
         let sum_y = 0;
         let sum_xx = 0;
@@ -87,7 +90,7 @@
             sum_xx += p.x * p.x;
             sum_xy += p.x * p.y;
         });
-        
+
         // Calculate the line formula.
         const a = (sum_xy - sum_x * sum_y) / (sum_xx - sum_x * sum_x);
         const n = 500;
@@ -96,8 +99,9 @@
         // Draw the regression line.    
         for (let x = -250; x <= 250; x += 10) {
             y = a * x + b;
-            drawDot(x, y, 'red');
+            drawDot(x, y, "red");
         }
-      </script>
+    </script>
 </body>
+
 </html>
