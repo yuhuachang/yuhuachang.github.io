@@ -39,6 +39,7 @@
         b = \frac{1}{n} \sum_i{y_i} - a \frac{1}{n} \sum_i{x_i}
         \]
     </p>
+    <button id="generate">Generate</button>
     <canvas id="canvas" width="500" height="500"></canvas>
     <script>
         const canvas = document.getElementById("canvas");
@@ -65,42 +66,53 @@
             ctx.closePath();
         };
 
-        drawLine(-250, 0, 250, 0)
-        drawLine(0, -250, 0, 250)
+        const refresh = () => {
 
-        // Define an array of (x, y) points
-        const points = [];
-        for (let x = -250; x <= 250; x += 10) {
-            points.push({
-                x: x,
-                y: Math.random() * 150 - 100 + x / 2
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawLine(-250, 0, 250, 0)
+            drawLine(0, -250, 0, 250)
+
+            // Define an array of (x, y) points
+            const points = [];
+            for (let x = -250; x <= 250; x += 10) {
+                points.push({
+                    x: x,
+                    y: Math.random() * 150 - 100 + x / 2
+                });
+            }
+
+            // Draw the points on the canvas
+            points.forEach(p => drawDot(p.x, p.y, "blue"));
+
+            let sum_x = 0;
+            let sum_y = 0;
+            let sum_xx = 0;
+            let sum_xy = 0;
+            points.forEach(p => {
+                sum_x += p.x;
+                sum_y += p.y;
+                sum_xx += p.x * p.x;
+                sum_xy += p.x * p.y;
             });
-        }
 
-        // Draw the points on the canvas
-        points.forEach(p => drawDot(p.x, p.y, "blue"));
+            // Calculate the line formula.
+            const a = (sum_xy - sum_x * sum_y) / (sum_xx - sum_x * sum_x);
+            const n = 500;
+            const b = (1 / n) * sum_y - a * (1 / n) * sum_x;
 
-        let sum_x = 0;
-        let sum_y = 0;
-        let sum_xx = 0;
-        let sum_xy = 0;
-        points.forEach(p => {
-            sum_x += p.x;
-            sum_y += p.y;
-            sum_xx += p.x * p.x;
-            sum_xy += p.x * p.y;
+            // Draw the regression line.    
+            for (let x = -250; x <= 250; x += 10) {
+                y = a * x + b;
+                drawDot(x, y, "red");
+            }
+        };
+
+        const generate = document.getElementById("generate");
+        generate.addEventListener("click", e => {
+            refresh();
         });
 
-        // Calculate the line formula.
-        const a = (sum_xy - sum_x * sum_y) / (sum_xx - sum_x * sum_x);
-        const n = 500;
-        const b = (1 / n) * sum_y - a * (1 / n) * sum_x;
-
-        // Draw the regression line.    
-        for (let x = -250; x <= 250; x += 10) {
-            y = a * x + b;
-            drawDot(x, y, "red");
-        }
+        refresh();
     </script>
 </body>
 
