@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Andle</title>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            display: inline-grid;
+            margin: 20px;
+        }
+
+        canvas {
+            border: 1px solid black;
+        }
+
+        input {
+            width: 400px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="point1"></div>
+    <div id="line1"></div>
+    <div id="point2"></div>
+    <div id="line2"></div>
+    <div id="angle"></div>
+    <div>
+        <label>x1:
+            <input id="x1-slider" type="range" min="-250" max="250" step="1" value="100">
+        </label>
+    </div>
+    <div>
+        <label>y1:
+            <input id="y1-slider" type="range" min="-250" max="250" step="1" value="100">
+        </label>
+    </div>
+    <div>
+        <label>x2:
+            <input id="x2-slider" type="range" min="-250" max="250" step="1" value="100">
+        </label>
+    </div>
+    <div>
+        <label>y2:
+            <input id="y2-slider" type="range" min="-250" max="250" step="1" value="0">
+        </label>
+    </div>
+    <canvas id="canvas" width="500" height="500"></canvas>
+    <script>
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        const _x = x => x + 250;
+        const _y = y => (y - 250) * -1;
+
+        const drawDot = (x, y, size, color) => {
+            ctx.beginPath();
+            ctx.arc(_x(x), _y(y), size, 0, Math.PI * 2); // Draw a circle at the point
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.closePath();
+        };
+
+        const drawLine = (x1, y1, x2, y2) => {
+            ctx.beginPath();
+            ctx.strokeStyle = "black";
+            ctx.lineWidth = 1;
+            ctx.moveTo(_x(x1), _y(y1));
+            ctx.lineTo(_x(x2), _y(y2));
+            ctx.stroke();
+            ctx.closePath();
+        };
+
+        const p = [
+            { "x": 0, "y": 0 },
+            { "x": 100, "y": 100 }
+        ];
+
+        const q= [
+            { "x": 0, "y": 0 },
+            { "x": 100, "y": 0 }
+        ];
+
+        const point1 = document.getElementById("point1");
+        const line1 = document.getElementById("line1");
+        const point2 = document.getElementById("point2");
+        const line2 = document.getElementById("line2");
+        const angle = document.getElementById("angle");
+
+        const refresh = () => {
+
+            point1.textContent = `\\[
+Points1 \\longrightarrow
+p_0 =
+\\begin{bmatrix}
+    x_0 \\\\
+    y_0
+\\end{bmatrix}
+=
+\\begin{bmatrix}
+    ${p[0].x} \\\\
+    ${p[0].y}
+\\end{bmatrix}
+\\space\\space\\space\\space
+p_1 =
+\\begin{bmatrix}
+    x_1 \\\\
+    y_1
+\\end{bmatrix}
+=
+\\begin{bmatrix}
+    ${p[1].x} \\\\
+    ${p[1].y}
+\\end{bmatrix}
+\\]`;
+            MathJax.typesetPromise([point1]).catch((err) => console.error(err));
+
+            line1.textContent = `\\[
+\\begin{align}
+    Line1 \\longrightarrow
+    f(x) &= p_0 + t (p_1 - p_0)
+         \\\\
+         &= \\begin{bmatrix}
+                x_0 \\\\
+                y_0
+            \\end{bmatrix}
+            +
+            t(
+                \\begin{bmatrix}
+                    x_1 \\\\
+                    y_1
+                \\end{bmatrix}
+                -
+                \\begin{bmatrix}
+                    x_0 \\\\
+                    y_0
+                \\end{bmatrix}
+            )
+         \\\\
+         &= \\begin{bmatrix}
+                x_0 \\\\
+                y_0
+            \\end{bmatrix}
+            +
+            t(
+            \\begin{bmatrix}
+                x_1 - x_0 \\\\
+                y_1 - y_0
+            \\end{bmatrix}
+            )
+         \\\\
+         &= \\begin{bmatrix}
+                x_0 \\\\
+                y_0
+            \\end{bmatrix}
+            +
+            \\begin{bmatrix}
+                t(x_1 - x_0) \\\\
+                t(y_1 - y_0)
+            \\end{bmatrix}
+         \\\\
+         &= \\begin{bmatrix}
+                x_0 + t(x_1 - x_0) \\\\
+                y_0 + t(y_1 - y_0)
+            \\end{bmatrix}
+         \\\\
+         &= \\begin{bmatrix}
+                ${p[0].x} + t(${p[1].x} - ${p[0].x}) \\\\
+                ${p[0].y} + t(${p[1].y} - ${p[0].y})
+            \\end{bmatrix}
+         \\\\
+         &= \\begin{bmatrix}
+                ${p[0].x} + t(${p[1].x - p[0].x}) \\\\
+                ${p[0].y} + t(${p[1].y - p[0].y})
+            \\end{bmatrix}
+\\end{align}
+\\]`;
+            MathJax.typesetPromise([line1]).catch((err) => console.error(err));
+
+            point2.textContent = `\\[
+Points2 \\longrightarrow
+q_0 =
+\\begin{bmatrix}
+    x_0 \\\\
+    y_0
+\\end{bmatrix}
+=
+\\begin{bmatrix}
+    ${q[0].x} \\\\
+    ${q[0].y}
+\\end{bmatrix}
+\\space\\space\\space\\space
+q_1 =
+\\begin{bmatrix}
+    x_1 \\\\
+    y_1
+\\end{bmatrix}
+=
+\\begin{bmatrix}
+    ${q[1].x} \\\\
+    ${q[1].y}
+\\end{bmatrix}
+\\]`;
+            MathJax.typesetPromise([point2]).catch((err) => console.error(err));
+
+            line2.textContent = `\\[
+\\begin{align}
+    Line2 \\longrightarrow
+    g(x) &= q_0 + t (q_1 - q_0)
+         \\\\
+         &= \\begin{bmatrix}
+                ${q[0].x} + t(${q[1].x} - ${q[0].x}) \\\\
+                ${q[0].y} + t(${q[1].y} - ${q[0].y})
+            \\end{bmatrix}
+         \\\\
+         &= \\begin{bmatrix}
+                ${q[0].x} + t(${q[1].x - q[0].x}) \\\\
+                ${q[0].y} + t(${q[1].y - q[0].y})
+            \\end{bmatrix}
+\\end{align}
+\\]`;
+            MathJax.typesetPromise([line2]).catch((err) => console.error(err));
+
+            angle.textContent = `\\[
+\\begin{align}
+    \\overrightarrow{A} \\cdot \\overrightarrow{B} &= \\lvert \\overrightarrow{A} \\rvert \\lvert \\overrightarrow{B} \\rvert \\cos(\\theta)
+    \\\\
+    \\cos(\\theta) &= \\frac {\\overrightarrow{A} \\cdot \\overrightarrow{B}}{\\lvert \\overrightarrow{A} \\rvert \\lvert \\overrightarrow{B} \\rvert}
+    \\\\
+    \\theta &= \\cos^{-1}(\\frac {\\overrightarrow{A} \\cdot \\overrightarrow{B}}{\\lvert \\overrightarrow{A} \\rvert \\lvert \\overrightarrow{B} \\rvert})
+
+    
+    &= 
+    f(x) &= p_0 + t (p_1 - p_0)
+         \\\\
+         &= \\begin{bmatrix}
+                x_0 \\\\
+                y_0
+            \\end{bmatrix}
+            +
+            t(
+                \\begin{bmatrix}
+                    x_1 \\\\
+                    y_1
+                \\end{bmatrix}
+                -
+                \\begin{bmatrix}
+                    x_0 \\\\
+                    y_0
+                \\end{bmatrix}
+            )
+         \\\\
+         &= \\begin{bmatrix}
+                x_0 \\\\
+                y_0
+            \\end{bmatrix}
+            +
+            t(
+            \\begin{bmatrix}
+                x_1 - x_0 \\\\
+                y_1 - y_0
+            \\end{bmatrix}
+            )
+         \\\\
+         &= \\begin{bmatrix}
+                x_0 \\\\
+                y_0
+            \\end{bmatrix}
+            +
+            \\begin{bmatrix}
+                t(x_1 - x_0) \\\\
+                t(y_1 - y_0)
+            \\end{bmatrix}
+         \\\\
+         &= \\begin{bmatrix}
+                x_0 + t(x_1 - x_0) \\\\
+                y_0 + t(y_1 - y_0)
+            \\end{bmatrix}
+         \\\\
+         &= \\begin{bmatrix}
+                ${p[0].x} + t(${p[1].x} - ${p[0].x}) \\\\
+                ${p[0].y} + t(${p[1].y} - ${p[0].y})
+            \\end{bmatrix}
+         \\\\
+         &= \\begin{bmatrix}
+                ${p[0].x} + t(${p[1].x - p[0].x}) \\\\
+                ${p[0].y} + t(${p[1].y - p[0].y})
+            \\end{bmatrix}
+\\end{align}
+\\]`;
+            MathJax.typesetPromise([angle]).catch((err) => console.error(err));
+
+
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawLine(-250, 0, 250, 0);
+            drawLine(0, -250, 0, 250);
+
+            // for (let x = -250; x <= 250; x += 1) {
+            //     y1 = o[0].a * x + o[0].b;
+            //     y2 = o[1].a * x + o[1].b;
+            //     drawDot(x, y1, 2, "green");
+            //     drawDot(x, y2, 2, "blue");
+            // }
+            // drawDot(x, y, 5, "red");
+        };
+
+        document.getElementById("x1-slider").addEventListener("input", e => {
+            p[1].x = parseFloat(e.target.value);
+            refresh();
+        });
+        document.getElementById("y1-slider").addEventListener("input", e => {
+            p[1].y = parseFloat(e.target.value);
+            refresh();
+        });
+        document.getElementById("x2-slider").addEventListener("input", e => {
+            q[1].x = parseFloat(e.target.value);
+            refresh();
+        });
+        document.getElementById("y2-slider").addEventListener("input", e => {
+            q[1].y = parseFloat(e.target.value);
+            refresh();
+        });
+
+        refresh();
+    </script>
+</body>
+
+</html>

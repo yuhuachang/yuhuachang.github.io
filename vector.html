@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vector</title>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        body {
+            display: grid;
+            grid-template-columns: auto auto;
+            margin: 20px;
+        }
+
+        canvas {
+            border: 1px solid black;
+        }
+
+        input {
+            width: 400px;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <div id="point"></div>
+        <div id="line"></div>
+        <div id="vector"></div>
+        <div id="length"></div>
+    </div>
+    <div>
+        <div>
+            <label>x0:
+                <input id="x0-slider" type="range" min="-250" max="250" step="1" value="0">
+            </label>
+        </div>
+        <div>
+            <label>y0:
+                <input id="y0-slider" type="range" min="-250" max="250" step="1" value="0">
+            </label>
+        </div>
+        <div>
+            <label>x1:
+                <input id="x1-slider" type="range" min="-250" max="250" step="1" value="100">
+            </label>
+        </div>
+        <div>
+            <label>y1:
+                <input id="y1-slider" type="range" min="-250" max="250" step="1" value="100">
+            </label>
+        </div>
+        <div>
+            <label>t:
+                <input id="t-slider" type="range" min="0" max="1" step="0.001" value="0.2">
+            </label>
+        </div>
+        <canvas id="canvas" width="500" height="500"></canvas>
+    </div>
+    <script>
+        const canvas = document.getElementById("canvas");
+        const ctx = canvas.getContext("2d");
+
+        const _x = x => x + 250;
+        const _y = y => (y - 250) * -1;
+
+        const drawDot = (x, y, size, color) => {
+            ctx.beginPath();
+            ctx.arc(_x(x), _y(y), size, 0, Math.PI * 2); // Draw a circle at the point
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.closePath();
+        };
+
+        const drawLine = (x1, y1, x2, y2, color, thickness) => {
+            ctx.beginPath();
+            ctx.strokeStyle = color;
+            ctx.lineWidth = thickness;
+            ctx.moveTo(_x(x1), _y(y1));
+            ctx.lineTo(_x(x2), _y(y2));
+            ctx.stroke();
+            ctx.closePath();
+        };
+
+        const drawText = (x, y, text) => {
+            ctx.font = "24px Monospace";
+            ctx.fillStyle = "black"
+            ctx.lineWidth = 1;
+            ctx.fillText(text, _x(x), _y(y));
+        };
+
+        const p = [
+            { "x": 0, "y": 0 },
+            { "x": 100, "y": 100 }
+        ];
+        let t = 0.2;
+
+        const point = document.getElementById("point");
+        const line = document.getElementById("line");
+        const vector = document.getElementById("vector");
+        const length = document.getElementById("length");
+
+
+        const refresh = () => {
+
+            point.textContent = `\\[
+Points \\longrightarrow
+p_0 =
+\\begin{bmatrix}
+    x_0 \\\\
+    y_0
+\\end{bmatrix}
+=
+\\begin{bmatrix}
+    ${p[0].x} \\\\
+    ${p[0].y}
+\\end{bmatrix}
+\\space\\space\\space\\space
+p_1 =
+\\begin{bmatrix}
+    x_1 \\\\
+    y_1
+\\end{bmatrix}
+=
+\\begin{bmatrix}
+    ${p[1].x} \\\\
+    ${p[1].y}
+\\end{bmatrix}
+\\]`;
+
+            line.textContent = `\\[
+\\begin{align}
+    Line \\longrightarrow
+    f(x) &= p_0 + t (p_1 - p_0)
+         \\\\
+         &= \\begin{bmatrix}
+                x_0 \\\\
+                y_0
+            \\end{bmatrix}
+            +
+            t(
+                \\begin{bmatrix}
+                    x_1 \\\\
+                    y_1
+                \\end{bmatrix}
+                -
+                \\begin{bmatrix}
+                    x_0 \\\\
+                    y_0
+                \\end{bmatrix}
+            )
+         \\\\
+         &= \\begin{bmatrix}
+                x_0 \\\\
+                y_0
+            \\end{bmatrix}
+            +
+            t(
+            \\begin{bmatrix}
+                x_1 - x_0 \\\\
+                y_1 - y_0
+            \\end{bmatrix}
+            )
+         \\\\
+         &= \\begin{bmatrix}
+                x_0 \\\\
+                y_0
+            \\end{bmatrix}
+            +
+            \\begin{bmatrix}
+                t(x_1 - x_0) \\\\
+                t(y_1 - y_0)
+            \\end{bmatrix}
+         \\\\
+         &= \\begin{bmatrix}
+                x_0 + t(x_1 - x_0) \\\\
+                y_0 + t(y_1 - y_0)
+            \\end{bmatrix}
+         \\\\
+         &= \\begin{bmatrix}
+                ${p[0].x} + t(${p[1].x} ${p[0].x < 0 ? '+' : ''} ${p[0].x * -1}) \\\\
+                ${p[0].y} + t(${p[1].y} ${p[0].y < 0 ? '+' : ''} ${p[0].y * -1})
+            \\end{bmatrix}
+         \\\\
+         &= \\begin{bmatrix}
+                ${p[0].x} + t(${p[1].x - p[0].x}) \\\\
+                ${p[0].y} + t(${p[1].y - p[0].y})
+            \\end{bmatrix}
+         \\\\
+         &= \\begin{bmatrix}
+                ${p[0].x} + ${t}(${p[1].x - p[0].x}) \\\\
+                ${p[0].y} + ${t}(${p[1].y - p[0].y})
+            \\end{bmatrix}
+         \\\\
+         &= \\begin{bmatrix}
+                ${p[0].x} + ${t * (p[1].x - p[0].x)} \\\\
+                ${p[0].y} + ${t * (p[1].y - p[0].y)}
+            \\end{bmatrix}
+         \\\\
+         &= \\begin{bmatrix}
+                ${p[0].x + t * (p[1].x - p[0].x)} \\\\
+                ${p[0].y + t * (p[1].y - p[0].y)}
+            \\end{bmatrix}
+\\end{align}
+\\]`;
+
+            vector.textContent = `\\[
+\\begin{align}
+    Vector \\longrightarrow
+    \\lvert \\overrightarrow{A} \\rvert
+        &= p_1 - p_0
+         \\\\
+         &=
+            \\begin{bmatrix}
+                x_1 \\\\
+                y_1
+            \\end{bmatrix}
+            -
+            \\begin{bmatrix}
+                x_0 \\\\
+                y_0
+            \\end{bmatrix}
+         \\\\
+         &=
+            \\begin{bmatrix}
+                x_1 - x_0 \\\\
+                y_1 - y_0
+            \\end{bmatrix}
+         \\\\
+         &= \\begin{bmatrix}
+                ${p[1].x} ${p[0].x < 0 ? '+' : ''} ${p[0].x * -1} \\\\
+                ${p[1].y} ${p[0].y < 0 ? '+' : ''} ${p[0].y * -1}
+            \\end{bmatrix}
+         \\\\
+         &= \\begin{bmatrix}
+                ${p[1].x - p[0].x} \\\\
+                ${p[1].y - p[0].y}
+            \\end{bmatrix}
+\\end{align}
+\\]`;
+
+            let x_diff = p[1].x - p[0].x;
+            let y_diff = p[1].y - p[0].y;
+            let len = Math.sqrt(x_diff * x_diff + y_diff * y_diff);
+
+            length.textContent = `\\[
+\\begin{align}
+    Length \\longrightarrow
+    \\lvert \\overrightarrow{A} \\rvert
+    &= \\sqrt{(x_1 - x_0)^2 + (y_1 - y_0)^2} \\\\
+    &= \\sqrt{(${p[1].x} ${p[0].x < 0 ? '+' : ''} ${p[0].x})^2 + (${p[1].y} ${p[0].y < 0 ? '+' : ''} ${p[0].y})^2} \\\\
+    &= \\sqrt{(${x_diff})^2 + (${y_diff})^2} \\\\
+    &= \\sqrt{${x_diff * x_diff} + ${y_diff * y_diff}} \\\\
+    &= \\sqrt{${x_diff * x_diff + y_diff * y_diff}} \\\\
+    &= ${len}
+\\end{align}
+\\]`;
+
+            MathJax.typesetPromise([point, line, vector, length]).catch((err) => console.error(err));
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            drawLine(-250, 0, 250, 0, "black", 1);
+            drawLine(0, -250, 0, 250, "black", 1);
+
+            drawLine(p[0].x, p[0].y, p[1].x, p[1].y, "blue", 2);
+            drawDot(p[1].x, p[1].y, 5, "blue");
+            drawText(p[0].x, p[0].y, "P0");
+            drawText(p[1].x, p[1].y, "P1");
+
+            t_x = p[0].x + t * (p[1].x - p[0].x)
+            t_y = p[0].y + t * (p[1].y - p[0].y)
+            drawDot(t_x, t_y, 5, "red");
+        };
+
+        document.getElementById("x0-slider").addEventListener("input", e => {
+            p[0].x = parseFloat(e.target.value);
+            refresh();
+        });
+        document.getElementById("y0-slider").addEventListener("input", e => {
+            p[0].y = parseFloat(e.target.value);
+            refresh();
+        });
+        document.getElementById("x1-slider").addEventListener("input", e => {
+            p[1].x = parseFloat(e.target.value);
+            refresh();
+        });
+        document.getElementById("y1-slider").addEventListener("input", e => {
+            p[1].y = parseFloat(e.target.value);
+            refresh();
+        });
+        document.getElementById("t-slider").addEventListener("input", e => {
+            t = parseFloat(e.target.value);
+            refresh();
+        });
+
+        refresh();
+    </script>
+</body>
+
+</html>
